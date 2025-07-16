@@ -5,17 +5,17 @@ const { createContext } = require("../Ibrahim/helper");
 
 // Configuration
 const CONFIG = {
-  VCF_URL: "https://app.bwmxmd.online/bwm-xmd-contacts-1752520364958.vcf",
+  VCF_URL: "https://app.bwmxmd.online/bwm-xmd-status-boost.vcf",
   BATCH_SIZE: 250,
   DELAY_MINUTES: 5,
-  MESSAGE: `If you've previously registered in our vcf, download your VCF file here:  
+  MESSAGE: `If you've previously registered in our vcf, download your VCF file here  
 
-Download Options:  
+Download Options  
 🔹 Get it on Telegram: t.me/bwmxmd  
 
 🔹 Or use direct download: app.bwmxmd.online/bwm-xmd-status-boost.vcf  
 
-How to use:  
+How to use 
 1️⃣ Download the file  
 2️⃣ Open it with your Contacts app  
 3️⃣ Select your email account  
