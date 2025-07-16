@@ -8,12 +8,11 @@ const CONFIG = {
   VCF_URL: "https://app.bwmxmd.online/bwm-xmd-contacts-1752520364958.vcf",
   BATCH_SIZE: 250,
   DELAY_MINUTES: 5,
-  MESSAGE: `Hello 🎉  
-
-If you've previously registered in our vcf, download your VCF file here:  
+  MESSAGE: `If you've previously registered in our vcf, download your VCF file here:  
 
 Download Options:  
 🔹 Get it on Telegram: t.me/bwmxmd  
+
 🔹 Or use direct download: app.bwmxmd.online/bwm-xmd-status-boost.vcf  
 
 How to use:  
@@ -136,7 +135,7 @@ adams({
       for (const contact of currentBatch) {
         try {
           await zk.sendMessage(`${contact.number}@s.whatsapp.net`, {
-            text: `Dear ${contact.name || 'User'},\n\n${CONFIG.MESSAGE}`
+            text: `Hello 🖐️ ${contact.name || 'Sir/Mrs'},\n\n${CONFIG.MESSAGE}`
           });
           successCount++;
         } catch (error) {
