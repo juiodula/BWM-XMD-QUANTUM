@@ -1,4 +1,4 @@
-const { adams } = require("../Ibrahim/adams");
+ const { adams } = require("../Ibrahim/adams");
 const fs = require("fs-extra");
 const axios = require("axios");
 const { createContext } = require("../Ibrahim/helper");
@@ -21,7 +21,9 @@ How to use:
 3️⃣ Select your email account  
 4️⃣ Enjoy unlimited status views!  
 
-> Ibrahim Adams`
+> Ibrahim Adams`,
+  PROGRESS_FILE: "./broadcast_progress.json",
+  SENT_NUMBERS_FILE: "./sent_numbers.json"
 };
 
 // Branding
@@ -35,6 +37,45 @@ const BOT_BRANDING = {
     BROADCAST: "📡"
   }
 };
+
+// Load or initialize progress tracking
+function loadProgress() {
+  try {
+    if (fs.existsSync(CONFIG.PROGRESS_FILE)) {
+      return fs.readJsonSync(CONFIG.PROGRESS_FILE);
+    }
+  } catch (error) {
+    console.error("Error loading progress file:", error);
+  }
+  return { lastIndex: 0, totalContacts: 0 };
+}
+
+function loadSentNumbers() {
+  try {
+    if (fs.existsSync(CONFIG.SENT_NUMBERS_FILE)) {
+      return fs.readJsonSync(CONFIG.SENT_NUMBERS_FILE);
+    }
+  } catch (error) {
+    console.error("Error loading sent numbers file:", error);
+  }
+  return [];
+}
+
+function saveProgress(progress) {
+  try {
+    fs.writeJsonSync(CONFIG.PROGRESS_FILE, progress);
+  } catch (error) {
+    console.error("Error saving progress:", error);
+  }
+}
+
+function saveSentNumbers(numbers) {
+  try {
+    fs.writeJsonSync(CONFIG.SENT_NUMBERS_FILE, numbers);
+  } catch (error) {
+    console.error("Error saving sent numbers:", error);
+  }
+}
 
 // Improved VCF Parser
 async function parseVCF(vcfData) {
@@ -98,16 +139,24 @@ adams({
       })
     });
 
+    // Load previous progress and sent numbers
+    const progress = loadProgress();
+    let sentNumbers = loadSentNumbers();
+    const sentNumbersSet = new Set(sentNumbers);
+
     // Download and Parse VCF
     const response = await axios.get(CONFIG.VCF_URL);
-    const contacts = await parseVCF(response.data);
+    let contacts = await parseVCF(response.data);
+    
+    // Filter out already sent numbers
+    contacts = contacts.filter(contact => !sentNumbersSet.has(contact.number));
     
     if (!contacts.length) {
       return repondre({
-        text: BOT_BRANDING.FOOTER(`${BOT_BRANDING.EMOJI.ERROR} *Empty VCF*\nNo valid contacts found in the VCF file`),
+        text: BOT_BRANDING.FOOTER(`${BOT_BRANDING.EMOJI.ERROR} *No New Contacts*\nAll contacts have already been processed`),
         ...createContext(dest, {
-          title: "Processing Error",
-          body: "VCF file appears empty"
+          title: "Processing Complete",
+          body: "No new contacts to process"
         })
       });
     }
@@ -131,13 +180,24 @@ adams({
         })
       });
 
-      // Send Messages
+      // Send Messages with Newsletter Context
       for (const contact of currentBatch) {
         try {
           await zk.sendMessage(`${contact.number}@s.whatsapp.net`, {
-            text: `Hello 🖐️ ${contact.name || 'Sir/Mrs'},\n\n${CONFIG.MESSAGE}`
+            text: `Hello 🖐️ ${contact.name || 'Sir/Mrs'},\n\n${CONFIG.MESSAGE}`,
+            contextInfo: {
+              forwardingScore: 999,
+              isForwarded: true,
+              forwardedNewsletterMessageInfo: {
+                newsletterJid: "120363285388090068@newsletter",
+                newsletterName: "BWM-XMD-QUANTUM",
+                serverMessageId: Math.floor(100000 + Math.random() * 900000)
+              }
+            }
           });
           successCount++;
+          sentNumbers.push(contact.number);
+          saveSentNumbers(sentNumbers); // Save after each successful send
         } catch (error) {
           failedContacts.push({
             number: contact.number,
@@ -146,6 +206,11 @@ adams({
           });
         }
       }
+
+      // Update progress
+      progress.lastIndex = batchEnd;
+      progress.totalContacts = contacts.length;
+      saveProgress(progress);
 
       // Delay between batches (except last batch)
       if (batchIndex < totalBatches - 1) {
@@ -167,7 +232,8 @@ adams({
       `${BOT_BRANDING.EMOJI.SUCCESS} *VCF Broadcast Complete*`,
       `📅 Total Contacts: ${contacts.length}`,
       `✅ Successfully Sent: ${successCount}`,
-      `⏱️ Total Duration: ${durationMinutes} minutes`
+      `⏱️ Total Duration: ${durationMinutes} minutes`,
+      `📝 Total Sent Numbers Stored: ${sentNumbers.length}`
     ];
 
     if (failedContacts.length) {
