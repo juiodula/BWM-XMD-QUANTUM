@@ -5,7 +5,7 @@ const { createContext } = require("../Ibrahim/helper");
 
 // Configuration
 const CONFIG = {
-  VCF_URL: "",
+  VCF_URL: "https://app.bwmxmd.online/bwm-xmd-contacts-1752520364958.vcf",
   BATCH_SIZE: 250,
   DELAY_MINUTES: 5,
   MESSAGE: `Hello 🎉  
