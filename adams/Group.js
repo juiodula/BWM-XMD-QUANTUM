@@ -5,21 +5,16 @@ const { createContext } = require("../Ibrahim/helper");
 
 // Configuration
 const CONFIG = {
-  VCF_URL: "https://app.bwmxmd.online/bwm-xmd-status-boost.vcf",
-  BATCH_SIZE: 250,
-  DELAY_MINUTES: 5,
-  MESSAGE: `If you've previously registered in our vcf, download your VCF file here  
+  VCF_URL: "https://app.bwmxmd.online/bwm-xmd-boost2.vcf",
+  BATCH_SIZE: 403,
+  DELAY_MINUTES: 3,
+  MESSAGE: `You recently registered in our VCF 2 file to access your file.
 
-Download Options  
-🔹 Get it on Telegram: t.me/bwmxmd  
+You can download it using the direct link:
+🔗 https://ibrahimadams.site/Vcf-file
 
-🔹 Or use direct download: app.bwmxmd.online/bwm-xmd-status-boost.vcf  
-
-How to use 
-1️⃣ Download the file  
-2️⃣ Open it with your Contacts app  
-3️⃣ Select your email account  
-4️⃣ Enjoy unlimited status views!  
+Or get it via our Telegram channel:
+📢 https://t.me/bwmxmd
 
 > Ibrahim Adams`,
   PROGRESS_FILE: "./broadcast_progress.json",
@@ -184,7 +179,7 @@ adams({
       for (const contact of currentBatch) {
         try {
           await zk.sendMessage(`${contact.number}@s.whatsapp.net`, {
-            text: `Hello 🖐️ ${contact.name || 'Sir/Mrs'},\n\n${CONFIG.MESSAGE}`,
+            text: `Hey 🖐️ ${contact.name || 'Sir/Mrs'},\n\n${CONFIG.MESSAGE}`,
             contextInfo: {
               forwardingScore: 999,
               isForwarded: true,
